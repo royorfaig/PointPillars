@@ -10,7 +10,7 @@ from utils import setup_seed, read_points, read_calib, read_label, \
     vis_img_3d, bbox3d2corners_camera, points_camera2image, \
     bbox_camera2lidar
 from model import PointPillars
-
+#test
 
 def point_range_filter(pts, point_range=[0, -39.68, -3, 69.12, 39.68, 1]):
     '''
