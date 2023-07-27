@@ -35,11 +35,7 @@ class BaseSampler():
 
 class Kitti(Dataset):
 
-    CLASSES = {
-        'Pedestrian': 0, 
-        'Cyclist': 1, 
-        'Car': 2
-        }
+    CLASSES = {'Trunk': 0}
 
     def __init__(self, data_root, split, pts_prefix='velodyne_reduced'):
         assert split in ['train', 'val', 'trainval', 'test']
@@ -57,7 +53,7 @@ class Kitti(Dataset):
         self.data_aug_config=dict(
             db_sampler=dict(
                 db_sampler=db_sampler,
-                sample_groups=dict(Car=15, Pedestrian=10, Cyclist=10)
+                sample_groups=dict(Trunk=10)
                 ),
             object_noise=dict(
                 num_try=100,
@@ -86,7 +82,7 @@ class Kitti(Dataset):
             db_infos[k] = [item for item in v if item['difficulty'] != -1]
 
         # 2. filter_by_min_points, dict(Car=5, Pedestrian=10, Cyclist=10)
-        filter_thrs = dict(Car=5, Pedestrian=10, Cyclist=10)
+        filter_thrs = dict(Trunk=10)
         for cat in self.CLASSES:
             filter_thr = filter_thrs[cat]
             db_infos[cat] = [item for item in db_infos[cat] if item['num_points_in_gt'] >= filter_thr]
@@ -116,6 +112,8 @@ class Kitti(Dataset):
         rotation_y = annos_info['rotation_y']
         gt_bboxes = np.concatenate([annos_location, annos_dimension, rotation_y[:, None]], axis=1).astype(np.float32)
         gt_bboxes_3d = bbox_camera2lidar(gt_bboxes, tr_velo_to_cam, r0_rect)
+        # print("gt_bboxes_3d: {}".format(gt_bboxes_3d))
+        # print("annos_name: {}".format(annos_name))
         gt_labels = [self.CLASSES.get(name, -1) for name in annos_name]
         data_dict = {
             'pts': pts,
@@ -124,12 +122,13 @@ class Kitti(Dataset):
             'gt_names': annos_name,
             'difficulty': annos_info['difficulty'],
             'image_info': image_info,
-            'calib_info': calib_info
+            'calib_info': calib_info,
+            'fileID': index, 
         }
-        if self.split in ['train', 'trainval']:
-            data_dict = data_augment(self.CLASSES, self.data_root, data_dict, self.data_aug_config)
-        else:
-            data_dict = point_range_filter(data_dict, point_range=self.data_aug_config['point_range_filter'])
+        # if self.split in ['train', 'trainval']:
+        #    data_dict = data_augment(self.CLASSES, self.data_root, data_dict, self.data_aug_config)
+        # else:
+        #    data_dict = point_range_filter(data_dict, point_range=self.data_aug_config['point_range_filter'])
 
         return data_dict
 

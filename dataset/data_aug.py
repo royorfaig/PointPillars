@@ -24,6 +24,7 @@ def dbsample(CLASSES, data_root, data_dict, db_sampler, sample_groups):
     sampled_bboxes, sampled_difficulty = [], []
 
     avoid_coll_boxes = copy.deepcopy(gt_bboxes_3d)
+    print("sample_groups.items() {}".format(sample_groups.items()))
     for name, v in sample_groups.items():
         # 1. calculate sample numbers
         sampled_num = v - np.sum(gt_names == name)
@@ -36,6 +37,7 @@ def dbsample(CLASSES, data_root, data_dict, db_sampler, sample_groups):
 
         # 3. box_collision_test
         avoid_coll_boxes_bv_corners = bbox3d2bevcorners(avoid_coll_boxes)
+        print("sampled_cls_bboxes {}".format(sampled_cls_bboxes))
         sampled_cls_bboxes_bv_corners = bbox3d2bevcorners(sampled_cls_bboxes)
         coll_query_matrix = np.concatenate([avoid_coll_boxes_bv_corners, sampled_cls_bboxes_bv_corners], axis=0)
         coll_mat = box_collision_test(coll_query_matrix, coll_query_matrix)

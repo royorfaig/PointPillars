@@ -90,6 +90,7 @@ def points_camera2lidar(points, tr_velo_to_cam, r0_rect):
     extended_xyz = np.pad(points, ((0, 0), (0, 0), (0, 1)), 'constant', constant_values=1.0)
     rt_mat = np.linalg.inv(r0_rect @ tr_velo_to_cam)
     xyz = extended_xyz @ rt_mat.T
+    #print("xyz: {}".format(xyz))
     return xyz[..., :3]
 
 
@@ -108,6 +109,7 @@ def bbox3d2bevcorners(bboxes):
 
     return: shape=(n, 4, 2)
     '''
+    #print("bboxes: {}".format(bboxes))
     centers, dims, angles = bboxes[:, :2], bboxes[:, 3:5], bboxes[:, 6]
 
     # 1.generate bbox corner coordinates, clockwise from minimal point
@@ -140,8 +142,9 @@ def bbox3d2corners(bboxes):
                             3 ------ 0 
     x: front, y: left, z: top
     '''
+    #print("bboxes: {}".format(bboxes))
     centers, dims, angles = bboxes[:, :3], bboxes[:, 3:6], bboxes[:, 6]
-
+    #print("dim {}".format(dims))
     # 1.generate bbox corner coordinates, clockwise from minimal point
     bboxes_corners = np.array([[-0.5, -0.5, 0], [-0.5, -0.5, 1.0], [-0.5, 0.5, 1.0], [-0.5, 0.5, 0.0],
                                [0.5, -0.5, 0], [0.5, -0.5, 1.0], [0.5, 0.5, 1.0], [0.5, 0.5, 0.0]], 
@@ -160,6 +163,7 @@ def bbox3d2corners(bboxes):
 
     # 3. translate to centers
     bboxes_corners += centers[:, None, :]
+    #print("bboxes_corners {}".format(bboxes_corners))
     return bboxes_corners
 
 
@@ -178,7 +182,7 @@ def bbox3d2corners_camera(bboxes):
     v y(down)                   
     '''
     centers, dims, angles = bboxes[:, :3], bboxes[:, 3:6], bboxes[:, 6]
-
+    #print("dim {}".format(dims))
     # 1.generate bbox corner coordinates, clockwise from minimal point
     bboxes_corners = np.array([[0.5, 0.0, -0.5], [0.5, -1.0, -0.5], [-0.5, -1.0, -0.5], [-0.5, 0.0, -0.5],
                                [0.5, 0.0, 0.5], [0.5, -1.0, 0.5], [-0.5, -1.0, 0.5], [-0.5, 0.0, 0.5]], 
@@ -197,6 +201,7 @@ def bbox3d2corners_camera(bboxes):
 
     # 3. translate to centers
     bboxes_corners += centers[:, None, :]
+    #print("bboxes_corners {}".format(bboxes_corners))
     return bboxes_corners
 
 
@@ -629,7 +634,9 @@ def points_in_bboxes_v2(points, r0_rect, tr_velo_to_cam, dimensions, location, r
     location, dimensions = location[:n_valid_bbox], dimensions[:n_valid_bbox]
     rotation_y, name = rotation_y[:n_valid_bbox], name[:n_valid_bbox]
     bboxes_camera = np.concatenate([location, dimensions, rotation_y[:, None]], axis=1)
-    bboxes_lidar = bbox_camera2lidar(bboxes_camera, tr_velo_to_cam, r0_rect)
+    #print("bboxes_camera {}".format(bboxes_camera))
+    #bboxes_lidar = bbox_camera2lidar(bboxes_camera, tr_velo_to_cam, r0_rect)
+    bboxes_lidar = bboxes_camera
     bboxes_corners = bbox3d2corners(bboxes_lidar)
     group_rectangle_vertexs_v = group_rectangle_vertexs(bboxes_corners)
     frustum_surfaces = group_plane_equation(group_rectangle_vertexs_v)

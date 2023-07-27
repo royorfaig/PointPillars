@@ -5,3 +5,22 @@ build/
 *_logs*
 tmp/
 results/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Python local files
+venv/ 
+env/ 
+*.pyc
+
+# Temporary files
+cmake-build-*/
+build/
+.ipynb_checkpoints/
+host_src-*gz
+
+# System files
+.directory
+
